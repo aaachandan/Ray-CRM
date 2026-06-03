@@ -1,6 +1,8 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(__dirname, '..', 'crm.db');
@@ -104,5 +106,15 @@ try {
 try {
   db.exec(`ALTER TABLE leads ADD COLUMN address TEXT`);
 } catch {}
+
+const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+if (userCount.count === 0) {
+  const id = uuidv4();
+  const adminEmail = process.env.ADMIN_EMAIL || 'aaachandan@gmail.com';
+  const adminPass = process.env.ADMIN_PASS || 'cg04dp6961';
+  const hashed = bcrypt.hashSync(adminPass, 10);
+  db.prepare('INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(id, 'Admin', adminEmail, hashed, 'admin');
+  console.log('Default admin account created: ' + adminEmail);
+}
 
 export default db;

@@ -43,6 +43,7 @@ export default function Login() {
           </h2>
 
           {error && <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">{error}</div>}
+          {!isRegister && <div className="mb-4 p-2 bg-yellow-50 text-yellow-700 rounded-lg text-xs">Default: aaachandan@gmail.com / cg04dp6961</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {isRegister && (
