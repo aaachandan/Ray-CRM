@@ -19,7 +19,8 @@ router.post('/register', (req, res) => {
 
   const hashedPassword = bcrypt.hashSync(password, 10);
   const id = uuidv4();
-  const userRole = role || 'agent';
+  const userCount = db.prepare('SELECT COUNT(*) as count FROM users').get();
+  const userRole = (userCount.count === 0) ? 'admin' : (role || 'agent');
 
   db.prepare(
     'INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)'
