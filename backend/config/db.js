@@ -29,6 +29,7 @@ db.exec(`
     name TEXT NOT NULL,
     phone TEXT,
     email TEXT,
+    shop_name TEXT,
     service TEXT DEFAULT 'general',
     source TEXT DEFAULT 'manual',
     status TEXT DEFAULT 'new',
@@ -95,6 +96,9 @@ db.exec(`
 
 try {
   db.exec(`ALTER TABLE leads ADD COLUMN service TEXT DEFAULT 'general'`);
+} catch {}
+try {
+  db.exec(`ALTER TABLE leads ADD COLUMN shop_name TEXT`);
 } catch {}
 
 export default db;

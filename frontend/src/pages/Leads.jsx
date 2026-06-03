@@ -12,7 +12,7 @@ export default function Leads() {
   const [statusFilter, setStatusFilter] = useState('')
   const [serviceFilter, setServiceFilter] = useState('')
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ name: '', phone: '', email: '', service: 'general', source: 'manual', notes: '' })
+  const [form, setForm] = useState({ name: '', phone: '', email: '', shop_name: '', service: 'general', source: 'manual', notes: '' })
   const [loading, setLoading] = useState(true)
 
   const fetchLeads = () => {
@@ -34,7 +34,7 @@ export default function Leads() {
   const createLead = async (e) => {
     e.preventDefault()
     await API.post('/leads', form)
-    setForm({ name: '', phone: '', email: '', service: 'general', source: 'manual', notes: '' })
+    setForm({ name: '', phone: '', email: '', shop_name: '', service: 'general', source: 'manual', notes: '' })
     setShowForm(false)
     fetchLeads()
   }
@@ -78,6 +78,7 @@ export default function Leads() {
             <h3 className="font-semibold text-gray-800 mb-4">New Lead</h3>
             <form onSubmit={createLead} className="space-y-3">
               <input required placeholder="Name" className="input-field" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
+              <input placeholder="Shop Name" className="input-field" value={form.shop_name} onChange={e => setForm({...form, shop_name: e.target.value})} />
               <input placeholder="Phone" className="input-field" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
               <input placeholder="Email" type="email" className="input-field" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
               <select className="input-field" value={form.service} onChange={e => setForm({...form, service: e.target.value})}>
@@ -141,6 +142,7 @@ export default function Leads() {
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Name</th>
+                  <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Shop</th>
                   <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Service</th>
                   <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Phone</th>
                   <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Source</th>
@@ -154,6 +156,7 @@ export default function Leads() {
                     <td className="p-3">
                       <Link to={`/leads/${lead.id}`} className="text-sm font-medium text-blue-600 hover:text-blue-800">{lead.name}</Link>
                     </td>
+                    <td className="p-3 text-sm text-gray-600">{lead.shop_name || '-'}</td>
                     <td className="p-3">
                       <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-700 capitalize">{lead.service || 'general'}</span>
                     </td>
@@ -176,6 +179,7 @@ export default function Leads() {
                   <span className={`status-badge ${statusColors[lead.status] || 'status-new'}`}>{lead.status}</span>
                 </div>
                 <div className="text-xs text-gray-600 space-y-1">
+                  <p><span className="font-medium">Shop:</span> {lead.shop_name || '-'}</p>
                   <p><span className="font-medium">Service:</span> <span className="capitalize">{lead.service || 'general'}</span></p>
                   <p><span className="font-medium">Phone:</span> {lead.phone || '-'}</p>
                   <p><span className="font-medium">Source:</span> <span className="capitalize">{lead.source}</span></p>
