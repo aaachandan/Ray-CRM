@@ -32,7 +32,7 @@ export default function Login() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Building2 className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-800">MyCRM</span>
+            <span className="text-2xl font-bold text-gray-800">Ray Services CRM</span>
           </div>
           <p className="text-gray-600">Manage your customers, calls & follow-ups</p>
         </div>

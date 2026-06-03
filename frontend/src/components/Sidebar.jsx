@@ -16,7 +16,7 @@ export default function Sidebar({ user, onLogout }) {
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center gap-2">
           <Building2 className="w-7 h-7 text-blue-600" />
-          <span className="text-lg font-bold text-gray-800">MyCRM</span>
+          <span className="text-lg font-bold text-gray-800">Ray Services CRM</span>
         </div>
       </div>
 
