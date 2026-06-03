@@ -54,9 +54,9 @@ app.get('/api/reset', (req, res) => {
     );
     CREATE TABLE IF NOT EXISTS leads (
       id TEXT PRIMARY KEY, user_id TEXT NOT NULL, name TEXT NOT NULL, phone TEXT,
-      email TEXT, service TEXT DEFAULT 'general', source TEXT DEFAULT 'manual',
-      status TEXT DEFAULT 'new', notes TEXT, assigned_to TEXT,
-      created_at TEXT DEFAULT (datetime('now')),
+      email TEXT, shop_name TEXT, address TEXT, service TEXT DEFAULT 'general',
+      source TEXT DEFAULT 'manual', status TEXT DEFAULT 'new', notes TEXT,
+      assigned_to TEXT, created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
