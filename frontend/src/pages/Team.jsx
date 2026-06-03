@@ -68,36 +68,57 @@ export default function Team() {
       ) : members.length === 0 ? (
         <div className="card p-8 text-center text-gray-500">No team members</div>
       ) : (
-        <div className="card overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Name</th>
-                <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Phone</th>
-                <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {members.map(m => (
-                <tr key={m.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="p-3 text-sm font-medium text-gray-800">{m.name}</td>
-                  <td className="p-3 text-sm text-gray-600">{m.email}</td>
-                  <td className="p-3">
-                    <span className="px-2 py-0.5 text-xs font-medium rounded-full capitalize bg-blue-100 text-blue-700">{m.role}</span>
-                  </td>
-                  <td className="p-3 text-sm text-gray-600">{m.phone || '-'}</td>
-                  <td className="p-3">
-                    {m.id !== user.id && (
-                      <button onClick={() => deleteMember(m.id)} className="text-xs text-red-600 hover:text-red-800">Remove</button>
-                    )}
-                  </td>
+        <>
+          <div className="hidden md:block card overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Name</th>
+                  <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Role</th>
+                  <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Phone</th>
+                  <th className="text-left p-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {members.map(m => (
+                  <tr key={m.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="p-3 text-sm font-medium text-gray-800">{m.name}</td>
+                    <td className="p-3 text-sm text-gray-600">{m.email}</td>
+                    <td className="p-3">
+                      <span className="px-2 py-0.5 text-xs font-medium rounded-full capitalize bg-blue-100 text-blue-700">{m.role}</span>
+                    </td>
+                    <td className="p-3 text-sm text-gray-600">{m.phone || '-'}</td>
+                    <td className="p-3">
+                      {m.id !== user.id && (
+                        <button onClick={() => deleteMember(m.id)} className="text-xs text-red-600 hover:text-red-800">Remove</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="md:hidden space-y-3">
+            {members.map(m => (
+              <div key={m.id} className="card p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <p className="text-sm font-medium text-gray-800">{m.name}</p>
+                  <span className="px-2 py-0.5 text-xs font-medium rounded-full capitalize bg-blue-100 text-blue-700">{m.role}</span>
+                </div>
+                <div className="text-xs text-gray-600 space-y-1">
+                  <p><span className="font-medium">Email:</span> {m.email}</p>
+                  <p><span className="font-medium">Phone:</span> {m.phone || '-'}</p>
+                </div>
+                {m.id !== user.id && (
+                  <div className="mt-2">
+                    <button onClick={() => deleteMember(m.id)} className="text-xs text-red-600 hover:text-red-800">Remove</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

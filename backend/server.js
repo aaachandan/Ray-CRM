@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
 import db from './config/db.js';
+import { authenticate } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
 import leadRoutes from './routes/leads.js';
 import callRoutes from './routes/calls.js';
@@ -24,6 +25,16 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/reminders', reminderRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/reports', reportRoutes);
+
+app.get('/api/export/leads', authenticate, (req, res) => {
+  const leads = db.prepare('SELECT * FROM leads ORDER BY created_at DESC').all();
+  const header = 'id,name,phone,email,service,source,status,notes,assigned_to,created_at,updated_at';
+  const rows = leads.map(l => `"${l.id}","${l.name}","${l.phone || ''}","${l.email || ''}","${l.service || ''}","${l.source || ''}","${l.status || ''}","${(l.notes || '').replace(/"/g,'""')}","${l.assigned_to || ''}","${l.created_at}","${l.updated_at}"`);
+  const csv = '\ufeff' + header + '\n' + rows.join('\n');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename=raycrm-leads.csv');
+  res.send(csv);
+});
 
 app.get('/api/reset', (req, res) => {
   db.exec(`

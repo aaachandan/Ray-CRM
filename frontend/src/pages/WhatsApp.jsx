@@ -39,9 +39,9 @@ export default function WhatsApp() {
 
       <div className="card p-5">
         <h3 className="text-sm font-medium text-gray-700 mb-3">Send Message</h3>
-        <form onSubmit={sendMessage} className="flex gap-2">
+        <form onSubmit={sendMessage} className="flex flex-col md:flex-row gap-2">
           <select
-            className="input-field w-48"
+            className="input-field w-full md:w-48"
             value={selectedLead}
             onChange={e => setSelectedLead(e.target.value)}
             required
@@ -56,7 +56,7 @@ export default function WhatsApp() {
             onChange={e => setContent(e.target.value)}
             required
           />
-          <button type="submit" className="btn-primary flex items-center gap-1">
+          <button type="submit" className="btn-primary flex items-center gap-1 justify-center">
             <Send className="w-4 h-4" /> Send
           </button>
         </form>
