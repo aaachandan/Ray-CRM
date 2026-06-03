@@ -8,8 +8,16 @@ router.use(authenticate);
 
 router.get('/', (req, res) => {
   const { status, search, assigned_to, service } = req.query;
-  let sql = 'SELECT l.*, u.name as assigned_name FROM leads l LEFT JOIN users u ON l.assigned_to = u.id WHERE (l.user_id = ? OR l.assigned_to = ?)';
-  const params = [req.user.id, req.user.id];
+  const isAdmin = req.user.role === 'admin';
+  let sql = 'SELECT l.*, u.name as assigned_name, u2.name as creator_name FROM leads l LEFT JOIN users u ON l.assigned_to = u.id LEFT JOIN users u2 ON l.user_id = u2.id';
+  const params = [];
+
+  if (!isAdmin) {
+    sql += ' WHERE (l.user_id = ? OR l.assigned_to = ?)';
+    params.push(req.user.id, req.user.id);
+  } else {
+    sql += ' WHERE 1=1';
+  }
 
   if (status) {
     sql += ' AND l.status = ?';

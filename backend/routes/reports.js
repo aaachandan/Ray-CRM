@@ -7,40 +7,41 @@ router.use(authenticate);
 
 router.get('/summary', (req, res) => {
   const userId = req.user.id;
+  const isAdmin = req.user.role === 'admin';
 
   const totalLeads = db.prepare(
-    'SELECT COUNT(*) as count FROM leads WHERE user_id = ? OR assigned_to = ?'
-  ).get(userId, userId);
+    isAdmin ? 'SELECT COUNT(*) as count FROM leads' : 'SELECT COUNT(*) as count FROM leads WHERE user_id = ? OR assigned_to = ?'
+  ).get(...(isAdmin ? [] : [userId, userId]));
 
   const leadsByStatus = db.prepare(
-    'SELECT status, COUNT(*) as count FROM leads WHERE user_id = ? OR assigned_to = ? GROUP BY status'
-  ).all(userId, userId);
+    isAdmin ? 'SELECT status, COUNT(*) as count FROM leads GROUP BY status' : 'SELECT status, COUNT(*) as count FROM leads WHERE user_id = ? OR assigned_to = ? GROUP BY status'
+  ).all(...(isAdmin ? [] : [userId, userId]));
 
   const leadsByService = db.prepare(
-    'SELECT service, COUNT(*) as count FROM leads WHERE user_id = ? OR assigned_to = ? GROUP BY service'
-  ).all(userId, userId);
+    isAdmin ? 'SELECT service, COUNT(*) as count FROM leads GROUP BY service' : 'SELECT service, COUNT(*) as count FROM leads WHERE user_id = ? OR assigned_to = ? GROUP BY service'
+  ).all(...(isAdmin ? [] : [userId, userId]));
 
   const totalCalls = db.prepare(
-    'SELECT COUNT(*) as count FROM calls WHERE user_id = ?'
-  ).get(userId);
+    isAdmin ? 'SELECT COUNT(*) as count FROM calls' : 'SELECT COUNT(*) as count FROM calls WHERE user_id = ?'
+  ).get(...(isAdmin ? [] : [userId]));
 
   const totalMessages = db.prepare(
-    'SELECT COUNT(*) as count FROM messages WHERE user_id = ?'
-  ).get(userId);
+    isAdmin ? 'SELECT COUNT(*) as count FROM messages' : 'SELECT COUNT(*) as count FROM messages WHERE user_id = ?'
+  ).get(...(isAdmin ? [] : [userId]));
 
   const pendingReminders = db.prepare(
-    'SELECT COUNT(*) as count FROM reminders WHERE user_id = ? AND status = "pending"'
-  ).get(userId);
+    isAdmin ? 'SELECT COUNT(*) as count FROM reminders WHERE status = "pending"' : 'SELECT COUNT(*) as count FROM reminders WHERE user_id = ? AND status = "pending"'
+  ).get(...(isAdmin ? [] : [userId]));
 
   const recentLeads = db.prepare(
-    'SELECT * FROM leads WHERE user_id = ? OR assigned_to = ? ORDER BY created_at DESC LIMIT 5'
-  ).all(userId, userId);
+    isAdmin ? 'SELECT * FROM leads ORDER BY created_at DESC LIMIT 5' : 'SELECT * FROM leads WHERE user_id = ? OR assigned_to = ? ORDER BY created_at DESC LIMIT 5'
+  ).all(...(isAdmin ? [] : [userId, userId]));
 
   const recentActivities = db.prepare(
-    `SELECT a.*, l.name as lead_name FROM activities a
-     LEFT JOIN leads l ON a.lead_id = l.id
-     WHERE a.user_id = ? ORDER BY a.created_at DESC LIMIT 10`
-  ).all(userId);
+    isAdmin
+      ? 'SELECT a.*, l.name as lead_name FROM activities a LEFT JOIN leads l ON a.lead_id = l.id ORDER BY a.created_at DESC LIMIT 10'
+      : 'SELECT a.*, l.name as lead_name FROM activities a LEFT JOIN leads l ON a.lead_id = l.id WHERE a.user_id = ? ORDER BY a.created_at DESC LIMIT 10'
+  ).all(...(isAdmin ? [] : [userId]));
 
   res.json({
     totalLeads: totalLeads.count,
