@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: ray-crm-backend
+    runtime: node
+    repo: https://github.com/aaachandan/Ray-CRM
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: PORT
+        value: 5000
+
+  - type: static
+    name: ray-crm-frontend
+    repo: https://github.com/aaachandan/Ray-CRM
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: ray-crm-backend
+          type: web
+          property: url
+          value: /api
+    headers:
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
