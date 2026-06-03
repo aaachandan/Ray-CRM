@@ -113,7 +113,7 @@ if (userCount.count === 0) {
   const adminEmail = process.env.ADMIN_EMAIL || 'aaachandan@gmail.com';
   const adminPass = process.env.ADMIN_PASS || 'cg04dp6961';
   const hashed = bcrypt.hashSync(adminPass, 10);
-  db.prepare('INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(id, 'Admin', adminEmail, hashed, 'admin');
+  db.prepare('INSERT INTO users (id, name, email, password, role) VALUES (?, ?, ?, ?, ?)').run(id, 'chandan', adminEmail, hashed, 'admin');
   console.log('Default admin account created: ' + adminEmail);
 }
 
