@@ -95,6 +95,37 @@ app.get('/api/reset', (req, res) => {
   res.json({ status: 'ok', message: 'All data reset successfully' });
 });
 
+app.get('/api/backup', authenticate, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const data = {
+    leads: db.prepare('SELECT * FROM leads').all(),
+    calls: db.prepare('SELECT * FROM calls').all(),
+    messages: db.prepare('SELECT * FROM messages').all(),
+    reminders: db.prepare('SELECT * FROM reminders').all(),
+    activities: db.prepare('SELECT * FROM activities').all(),
+    exported_at: new Date().toISOString()
+  };
+  res.json(data);
+});
+
+app.post('/api/restore', authenticate, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  const data = req.body;
+  const insert = (table, columns, rows) => {
+    if (!rows || rows.length === 0) return;
+    const placeholders = columns.map(() => '?').join(',');
+    const stmt = db.prepare(`INSERT OR REPLACE INTO ${table} (${columns.join(',')}) VALUES (${placeholders})`);
+    const tx = db.transaction(rws => { for (const row of rws) stmt.run(...columns.map(c => row[c] ?? null)); });
+    tx(rows);
+  };
+  insert('leads', ['id','user_id','name','phone','email','shop_name','address','service','source','status','notes','assigned_to','created_at','updated_at'], data.leads);
+  insert('calls', ['id','lead_id','user_id','type','duration','notes','outcome','recording_url','created_at'], data.calls);
+  insert('messages', ['id','lead_id','user_id','content','type','direction','status','created_at'], data.messages);
+  insert('reminders', ['id','lead_id','user_id','title','description','due_date','status','priority','created_at','completed_at'], data.reminders);
+  insert('activities', ['id','user_id','lead_id','type','description','created_at'], data.activities);
+  res.json({ status: 'ok', message: 'Data restored successfully', counts: { leads: data.leads?.length || 0 } });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });

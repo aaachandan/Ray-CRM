@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { UserPlus, Users as UsersIcon } from 'lucide-react'
+import { UserPlus, Users as UsersIcon, Download, Upload } from 'lucide-react'
 
 export default function Team() {
   const { API, user } = useAuth()
@@ -32,13 +32,51 @@ export default function Team() {
     return <div className="card p-8 text-center text-gray-500">Only admins can manage the team.</div>
   }
 
+  const backupData = async () => {
+    try {
+      const res = await API.get('/backup')
+      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: 'application/json' })
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'raycrm-backup.json'
+      document.body.appendChild(a); a.click()
+      document.body.removeChild(a); window.URL.revokeObjectURL(url)
+    } catch {}
+  }
+
+  const restoreData = async () => {
+    const input = document.createElement('input')
+    input.type = 'file'; input.accept = '.json'
+    input.onchange = async (e) => {
+      const file = e.target.files[0]
+      if (!file) return
+      const text = await file.text()
+      try {
+        const data = JSON.parse(text)
+        if (!confirm('This will replace ALL current data. Continue?')) return
+        await API.post('/restore', data)
+        alert('Data restored successfully! Reloading...')
+        window.location.reload()
+      } catch { alert('Invalid backup file') }
+    }
+    input.click()
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-lg font-semibold text-gray-800">Team Members</h2>
-        <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2">
-          <UserPlus className="w-4 h-4" /> Add Member
-        </button>
+        <div className="flex gap-2">
+          <button onClick={backupData} className="btn-secondary flex items-center gap-1 text-sm">
+            <Download className="w-4 h-4" /> Backup
+          </button>
+          <button onClick={restoreData} className="btn-secondary flex items-center gap-1 text-sm">
+            <Upload className="w-4 h-4" /> Restore
+          </button>
+          <button onClick={() => setShowForm(true)} className="btn-primary flex items-center gap-2">
+            <UserPlus className="w-4 h-4" /> Add Member
+          </button>
+        </div>
       </div>
 
       {showForm && (
