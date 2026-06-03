@@ -58,7 +58,7 @@ router.post('/', (req, res) => {
   const id = uuidv4();
   db.prepare(
     'INSERT INTO leads (id, user_id, name, phone, email, shop_name, address, service, source, notes, assigned_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-  ).run(id, req.user.id, name, phone, email, shop_name || null, address || null, service || 'general', source || 'manual', notes, assigned_to || null);
+  ).run(id, req.user.id, name, phone || null, email || null, shop_name || null, address || null, service || 'general', source || 'manual', notes || null, assigned_to || null);
 
   db.prepare(
     'INSERT INTO activities (id, user_id, lead_id, type, description) VALUES (?, ?, ?, ?, ?)'
@@ -77,15 +77,15 @@ router.put('/:id', (req, res) => {
     'UPDATE leads SET name=?, phone=?, email=?, shop_name=?, address=?, service=?, source=?, status=?, notes=?, assigned_to=?, updated_at=datetime("now") WHERE id=?'
   ).run(
     name || lead.name,
-    phone ?? lead.phone,
-    email ?? lead.email,
-    shop_name ?? lead.shop_name,
-    address ?? lead.address,
+    phone ?? (lead.phone || null),
+    email ?? (lead.email || null),
+    shop_name ?? (lead.shop_name || null),
+    address ?? (lead.address || null),
     service || lead.service,
     source || lead.source,
     status || lead.status,
-    notes ?? lead.notes,
-    assigned_to ?? lead.assigned_to,
+    notes ?? (lead.notes || null),
+    assigned_to ?? (lead.assigned_to || null),
     req.params.id
   );
 
