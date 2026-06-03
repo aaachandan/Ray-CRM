@@ -32,9 +32,9 @@ router.get('/', (req, res) => {
     params.push(assigned_to);
   }
   if (search) {
-    sql += ' AND (l.name LIKE ? OR l.phone LIKE ? OR l.email LIKE ? OR l.shop_name LIKE ?)';
+    sql += ' AND (l.name LIKE ? OR l.phone LIKE ? OR l.email LIKE ? OR l.shop_name LIKE ? OR l.address LIKE ?)';
     const s = `%${search}%`;
-    params.push(s, s, s, s);
+    params.push(s, s, s, s, s);
   }
 
   sql += ' ORDER BY l.created_at DESC';
@@ -52,13 +52,13 @@ router.get('/:id', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { name, phone, email, shop_name, service, source, notes, assigned_to } = req.body;
+  const { name, phone, email, shop_name, address, service, source, notes, assigned_to } = req.body;
   if (!name) return res.status(400).json({ error: 'Name is required' });
 
   const id = uuidv4();
   db.prepare(
-    'INSERT INTO leads (id, user_id, name, phone, email, shop_name, service, source, notes, assigned_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
-  ).run(id, req.user.id, name, phone, email, shop_name || null, service || 'general', source || 'manual', notes, assigned_to || null);
+    'INSERT INTO leads (id, user_id, name, phone, email, shop_name, address, service, source, notes, assigned_to) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+  ).run(id, req.user.id, name, phone, email, shop_name || null, address || null, service || 'general', source || 'manual', notes, assigned_to || null);
 
   db.prepare(
     'INSERT INTO activities (id, user_id, lead_id, type, description) VALUES (?, ?, ?, ?, ?)'
@@ -69,17 +69,18 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-  const { name, phone, email, shop_name, service, source, status, notes, assigned_to } = req.body;
+  const { name, phone, email, shop_name, address, service, source, status, notes, assigned_to } = req.body;
   const lead = db.prepare('SELECT * FROM leads WHERE id = ?').get(req.params.id);
   if (!lead) return res.status(404).json({ error: 'Lead not found' });
 
   db.prepare(
-    'UPDATE leads SET name=?, phone=?, email=?, shop_name=?, service=?, source=?, status=?, notes=?, assigned_to=?, updated_at=datetime("now") WHERE id=?'
+    'UPDATE leads SET name=?, phone=?, email=?, shop_name=?, address=?, service=?, source=?, status=?, notes=?, assigned_to=?, updated_at=datetime("now") WHERE id=?'
   ).run(
     name || lead.name,
     phone ?? lead.phone,
     email ?? lead.email,
     shop_name ?? lead.shop_name,
+    address ?? lead.address,
     service || lead.service,
     source || lead.source,
     status || lead.status,

@@ -82,6 +82,7 @@ export default function LeadDetail() {
             <h2 className="text-xl font-semibold text-gray-800">{lead.name}</h2>
             <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 flex-wrap">
               {lead.shop_name && <span><span className="font-medium">Shop:</span> {lead.shop_name}</span>}
+              {lead.address && <span><span className="font-medium">Addr:</span> {lead.address}</span>}
               <span>{lead.phone}</span>
               {lead.email && <span>· {lead.email}</span>}
               <span>· {lead.source}</span>
